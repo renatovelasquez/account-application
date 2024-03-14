@@ -11,6 +11,7 @@ public interface AccountMapper {
     void insert(Account account);
 
     @Result(property = "accountId", column = "account_id", id = true)
+    @Result(property = "customerId", column = "customer_id")
     @Select("SELECT * FROM account WHERE account_id = #{accountId}")
     Account findById(@Param("accountId") Integer accountId);
 

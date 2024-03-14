@@ -1,6 +1,7 @@
 package dev.renvl.mapper;
 
 import dev.renvl.model.AccountBalance;
+import dev.renvl.model.Currency;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -13,7 +14,12 @@ public interface AccountBalanceMapper {
     @Options(useGeneratedKeys = true, keyProperty = "accountBalanceId", keyColumn = "account_balance_id")
     void insert(AccountBalance accountBalance);
 
-    @Result(property = "accountBalanceId", column = "account_balance_id", id = true)
+    @Results({
+            @Result(property = "accountBalanceId", column = "account_balance_id", id = true),
+            @Result(property = "availableAmount", column = "available_amount"),
+            @Result(property = "currency", column = "currency", javaType = Currency.class),
+            @Result(property = "accountId", column = "account_id")
+    })
     @Select("SELECT * FROM account_balance WHERE account_id = #{accountId}")
     List<AccountBalance> findByAccountId(@Param("accountId") Integer accountId);
 

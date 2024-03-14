@@ -1,15 +1,13 @@
 package dev.renvl.controller;
 
 import dev.renvl.dto.CreateAccountRequest;
-import dev.renvl.dto.CreateAccountResponse;
 import dev.renvl.service.AccountService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/account/v1")
-@CrossOrigin
+@RequestMapping("/api/accounts/v1")
 public class AccountController {
 
     private final AccountService accountService;
@@ -18,8 +16,13 @@ public class AccountController {
         this.accountService = accountService;
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<CreateAccountResponse> process(@RequestBody @Valid CreateAccountRequest request) {
+    @PostMapping
+    public ResponseEntity<?> createAccount(@Valid @RequestBody CreateAccountRequest request) {
         return ResponseEntity.ok(accountService.createAccount(request));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getAccount(@PathVariable("id") Integer id) {
+        return ResponseEntity.ok(accountService.getAccount(id));
     }
 }

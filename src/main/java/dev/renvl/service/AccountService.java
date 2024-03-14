@@ -5,4 +5,6 @@ import dev.renvl.dto.CreateAccountResponse;
 
 public interface AccountService {
     CreateAccountResponse createAccount(CreateAccountRequest request);
+
+    CreateAccountResponse getAccount(Integer accountId);
 }
