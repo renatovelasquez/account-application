@@ -3,14 +3,12 @@ package dev.renvl.service;
 import dev.renvl.dto.CreateTransactionRequest;
 import dev.renvl.dto.CreateTransactionResponse;
 import dev.renvl.dto.TransactionResponse;
+import dev.renvl.exception.InsufficientFundsException;
 import dev.renvl.exception.RecordNotFoundException;
 import dev.renvl.mapper.AccountBalanceMapper;
 import dev.renvl.mapper.AccountMapper;
 import dev.renvl.mapper.TransactionMapper;
-import dev.renvl.model.Account;
-import dev.renvl.model.AccountBalance;
-import dev.renvl.model.Currency;
-import dev.renvl.model.Transaction;
+import dev.renvl.model.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,19 +36,25 @@ public class TransactionServiceImpl implements TransactionService {
         if (account == null || accountBalance == null) {
             throw new RecordNotFoundException("Account not found with id: " + request.getAccountId());
         }
-        BigDecimal newBalance = accountBalance.getAvailableAmount().add(request.getAmount());
-        if (newBalance.compareTo(BigDecimal.ZERO) < 0) {
-            throw new RecordNotFoundException("BigDecimal.ZERO");
+
+        BigDecimal currentBalance = accountBalance.getAvailableAmount();
+
+        if (DirectionTransaction.IN.name().compareTo(request.getDirection()) == 0) {
+            currentBalance = currentBalance.add(request.getAmount());
+        } else if (currentBalance.compareTo(request.getAmount()) >= 0) {
+            currentBalance = currentBalance.subtract(request.getAmount());
+        } else {
+            throw new InsufficientFundsException("Insufficient funds to perform the transaction");
         }
 
-        accountBalance.setAvailableAmount(newBalance);
+        accountBalance.setAvailableAmount(currentBalance);
         accountBalanceMapper.updateAvailableAmount(accountBalance);
 
         Transaction transaction = new Transaction(request.getAmount(), Currency.valueOf(request.getCurrency()),
                 request.getDirection(), request.getDescription(), request.getAccountId());
         transactionMapper.insert(transaction);
         return new CreateTransactionResponse(transaction.getAccountId(), transaction.getTransactionId(),
-                transaction.getAmount(), transaction.getCurrency(), transaction.getDirection(), transaction.getDescription(), newBalance);
+                transaction.getAmount(), transaction.getCurrency(), transaction.getDirection(), transaction.getDescription(), currentBalance);
     }
 
     @Override
