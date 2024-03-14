@@ -1,7 +1,7 @@
 package dev.renvl.service;
 
 import dev.renvl.dto.CreateAccountRequest;
-import dev.renvl.dto.CreateAccountResponse;
+import dev.renvl.dto.AccountResponse;
 import dev.renvl.exception.RecordNotFoundException;
 import dev.renvl.mapper.AccountBalanceMapper;
 import dev.renvl.mapper.AccountMapper;
@@ -30,7 +30,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public CreateAccountResponse createAccount(CreateAccountRequest request) {
+    public AccountResponse createAccount(CreateAccountRequest request) {
         Account account = new Account(request.getCountry(), request.getCustomerId());
         accountMapper.insert(account);
 
@@ -41,16 +41,16 @@ public class AccountServiceImpl implements AccountService {
             accountBalances.add(accountBalance);
         }
 
-        return new CreateAccountResponse(account.getAccountId(), account.getCustomerId(), accountBalances);
+        return new AccountResponse(account.getAccountId(), account.getCustomerId(), accountBalances);
     }
 
     @Override
-    public CreateAccountResponse getAccount(Integer accountId) {
+    public AccountResponse getAccount(Integer accountId) {
         Account account = accountMapper.findById(accountId);
         if (account == null) {
             throw new RecordNotFoundException("Account not found with id: " + accountId);
         }
         List<AccountBalance> accountBalances = accountBalanceMapper.findByAccountId(accountId);
-        return new CreateAccountResponse(account.getAccountId(), account.getCustomerId(), accountBalances);
+        return new AccountResponse(account.getAccountId(), account.getCustomerId(), accountBalances);
     }
 }

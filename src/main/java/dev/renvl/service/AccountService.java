@@ -1,10 +1,10 @@
 package dev.renvl.service;
 
 import dev.renvl.dto.CreateAccountRequest;
-import dev.renvl.dto.CreateAccountResponse;
+import dev.renvl.dto.AccountResponse;
 
 public interface AccountService {
-    CreateAccountResponse createAccount(CreateAccountRequest request);
+    AccountResponse createAccount(CreateAccountRequest request);
 
-    CreateAccountResponse getAccount(Integer accountId);
+    AccountResponse getAccount(Integer accountId);
 }

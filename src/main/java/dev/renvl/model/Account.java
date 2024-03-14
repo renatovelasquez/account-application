@@ -1,10 +1,8 @@
 package dev.renvl.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class Account {
     private Integer accountId;
     private String country;

@@ -8,10 +8,8 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class CreateAccountResponse {
-
+public class AccountResponse {
     private Integer accountId;
     private String customerId;
     private List<AccountBalance> balances;
-
 }
