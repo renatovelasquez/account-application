@@ -1,5 +1,6 @@
 package dev.renvl.controller;
 
+import dev.renvl.dto.AccountResponse;
 import dev.renvl.dto.CreateAccountRequest;
 import dev.renvl.service.AccountService;
 import jakarta.validation.Valid;
@@ -17,12 +18,12 @@ public class AccountController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createAccount(@Valid @RequestBody CreateAccountRequest request) {
+    public ResponseEntity<AccountResponse> createAccount(@Valid @RequestBody CreateAccountRequest request) {
         return ResponseEntity.ok(accountService.createAccount(request));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getAccount(@PathVariable("id") Integer id) {
+    public ResponseEntity<AccountResponse> getAccount(@PathVariable("id") Integer id) {
         return ResponseEntity.ok(accountService.getAccount(id));
     }
 }

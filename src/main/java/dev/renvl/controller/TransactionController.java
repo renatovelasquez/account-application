@@ -1,6 +1,8 @@
 package dev.renvl.controller;
 
 import dev.renvl.dto.CreateTransactionRequest;
+import dev.renvl.dto.CreateTransactionResponse;
+import dev.renvl.dto.TransactionResponse;
 import dev.renvl.service.TransactionService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +19,12 @@ public class TransactionController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createTransaction(@Valid @RequestBody CreateTransactionRequest request) {
+    public ResponseEntity<CreateTransactionResponse> createTransaction(@Valid @RequestBody CreateTransactionRequest request) {
         return ResponseEntity.ok(transactionService.createTransaction(request));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getTransaction(@PathVariable("id") Integer id) {
+    public ResponseEntity<TransactionResponse> getTransaction(@PathVariable("id") Integer id) {
         return ResponseEntity.ok(transactionService.getTransactionByAccountId(id));
     }
 }

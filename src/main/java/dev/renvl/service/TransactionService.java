@@ -5,7 +5,7 @@ import dev.renvl.dto.CreateTransactionResponse;
 import dev.renvl.dto.TransactionResponse;
 
 public interface TransactionService {
-    CreateTransactionResponse createTransaction(CreateTransactionRequest request);
-
     TransactionResponse getTransactionByAccountId(Integer accountId);
+
+    CreateTransactionResponse createTransaction(CreateTransactionRequest request);
 }
