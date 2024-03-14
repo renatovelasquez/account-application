@@ -33,5 +33,5 @@ public interface AccountBalanceMapper {
             @Result(property = "accountId", column = "account_id")
     })
     @Select("SELECT * FROM account_balance WHERE account_id = #{accountId} AND currency = #{currency}")
-    AccountBalance findByAccountIdAndCurrency(@Param("accountId") Integer accountId, @Param("currency") Currency currency);
+    AccountBalance findByAccountIdAndCurrency(@Param("accountId") Integer accountId, @Param("currency") String currency);
 }

@@ -9,6 +9,7 @@ import dev.renvl.mapper.AccountMapper;
 import dev.renvl.mapper.TransactionMapper;
 import dev.renvl.model.Account;
 import dev.renvl.model.AccountBalance;
+import dev.renvl.model.Currency;
 import dev.renvl.model.Transaction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,7 +46,7 @@ public class TransactionServiceImpl implements TransactionService {
         accountBalance.setAvailableAmount(newBalance);
         accountBalanceMapper.updateAvailableAmount(accountBalance);
 
-        Transaction transaction = new Transaction(request.getAmount(), request.getCurrency(),
+        Transaction transaction = new Transaction(request.getAmount(), Currency.valueOf(request.getCurrency()),
                 request.getDirection(), request.getDescription(), request.getAccountId());
         transactionMapper.insert(transaction);
         return new CreateTransactionResponse(transaction.getAccountId(), transaction.getTransactionId(),
