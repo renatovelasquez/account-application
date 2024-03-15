@@ -1,7 +1,7 @@
 package dev.renvl.service;
 
-import dev.renvl.dto.CreateAccountRequest;
 import dev.renvl.dto.AccountResponse;
+import dev.renvl.dto.CreateAccountRequest;
 import dev.renvl.exception.RecordNotFoundException;
 import dev.renvl.mapper.AccountBalanceMapper;
 import dev.renvl.mapper.AccountMapper;
@@ -14,11 +14,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
 public class AccountServiceImpl implements AccountService {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountServiceImpl.class);
     private final AccountMapper accountMapper;
     private final AccountBalanceMapper accountBalanceMapper;
@@ -33,12 +33,14 @@ public class AccountServiceImpl implements AccountService {
     public AccountResponse createAccount(CreateAccountRequest request) {
         Account account = new Account(request.getCountry(), request.getCustomerId());
         accountMapper.insert(account);
+        LOGGER.info("Created: {}", account);
 
         List<AccountBalance> accountBalances = new ArrayList<>();
         for (Currency currency : request.getCurrencies()) {
             AccountBalance accountBalance = new AccountBalance(currency, account.getAccountId());
             accountBalanceMapper.insert(accountBalance);
             accountBalances.add(accountBalance);
+            LOGGER.info("Created: {}", accountBalance);
         }
 
         return new AccountResponse(account.getAccountId(), account.getCustomerId(), accountBalances);
@@ -50,7 +52,11 @@ public class AccountServiceImpl implements AccountService {
         if (account == null) {
             throw new RecordNotFoundException("Account not found with id: " + accountId);
         }
+        LOGGER.info("Retrieved: {}", account);
+
         List<AccountBalance> accountBalances = accountBalanceMapper.findByAccountId(accountId);
+        LOGGER.info("Retrieved: {}", Arrays.toString(accountBalances.toArray()));
+
         return new AccountResponse(account.getAccountId(), account.getCustomerId(), accountBalances);
     }
 }

@@ -9,14 +9,18 @@ import dev.renvl.mapper.AccountBalanceMapper;
 import dev.renvl.mapper.AccountMapper;
 import dev.renvl.mapper.TransactionMapper;
 import dev.renvl.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(TransactionServiceImpl.class);
     private final TransactionMapper transactionMapper;
     private final AccountBalanceMapper accountBalanceMapper;
     private final AccountMapper accountMapper;
@@ -34,34 +38,43 @@ public class TransactionServiceImpl implements TransactionService {
         if (account == null) {
             throw new RecordNotFoundException("Account not found with id: " + accountId);
         }
-        return new TransactionResponse(transactionMapper.findByAccountId(account.getAccountId()));
+        LOGGER.info("Retrieved: {}", account);
+
+        List<Transaction> transactions = transactionMapper.findByAccountId(account.getAccountId());
+        LOGGER.info("Retrieved: {}", Arrays.toString(transactions.toArray()));
+
+        return new TransactionResponse(transactions);
     }
 
     @Override
     @Transactional
     public CreateTransactionResponse createTransaction(CreateTransactionRequest request) {
-        AccountBalance accountBalance = validateAccountBalance(request);
+        AccountBalance accountBalance = retrieveAccountBalance(request);
 
         BigDecimal currentBalance = validateAmount(request, accountBalance.getAvailableAmount());
         accountBalance.setAvailableAmount(currentBalance);
 
         accountBalanceMapper.updateAvailableAmount(accountBalance);
+        LOGGER.info("Updated: {}", accountBalance);
 
         Transaction transaction = new Transaction(request.getAmount(), Currency.valueOf(request.getCurrency()),
                 request.getDirection(), request.getDescription(), request.getAccountId());
         transactionMapper.insert(transaction);
+        LOGGER.info("Created: {}", transaction);
+
         return new CreateTransactionResponse(transaction.getAccountId(), transaction.getTransactionId(),
                 transaction.getAmount(), transaction.getCurrency(), transaction.getDirection(),
                 transaction.getDescription(), currentBalance);
     }
 
-    private AccountBalance validateAccountBalance(CreateTransactionRequest request) {
+    private AccountBalance retrieveAccountBalance(CreateTransactionRequest request) {
         Account account = accountMapper.findById(request.getAccountId());
         AccountBalance accountBalance = accountBalanceMapper.findByAccountIdAndCurrency(
                 request.getAccountId(), request.getCurrency());
         if (account == null || accountBalance == null) {
             throw new RecordNotFoundException("Account not found with id: " + request.getAccountId());
         }
+        LOGGER.info("Retrieved: {}", accountBalance);
         return accountBalance;
     }
 
@@ -73,6 +86,7 @@ public class TransactionServiceImpl implements TransactionService {
         } else {
             throw new InsufficientFundsException("Insufficient funds to perform the transaction");
         }
+        LOGGER.info("Validation for New Balance amount= {}", currentBalance);
         return currentBalance;
     }
 }
