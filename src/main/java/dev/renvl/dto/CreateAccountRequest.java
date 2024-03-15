@@ -3,7 +3,6 @@ package dev.renvl.dto;
 import dev.renvl.model.Currency;
 import dev.renvl.utils.ListMatchesEnum;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -18,7 +17,6 @@ public class CreateAccountRequest {
     private String customerId;
     @NotBlank(message = "Country must not be blank")
     private String country;
-    @NotEmpty(message = "Currencies must not be empty")
     @ListMatchesEnum(enumClass = Currency.class, message = "List elements do not match the Currency values")
     private List<String> currencies;
 
