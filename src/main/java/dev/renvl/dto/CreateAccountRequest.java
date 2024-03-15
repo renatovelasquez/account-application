@@ -4,12 +4,14 @@ import dev.renvl.model.Currency;
 import dev.renvl.utils.ListMatchesEnum;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
+@Builder
 @AllArgsConstructor
 public class CreateAccountRequest {
 
