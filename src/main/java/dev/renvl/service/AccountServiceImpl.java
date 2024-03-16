@@ -8,6 +8,7 @@ import dev.renvl.mapper.AccountMapper;
 import dev.renvl.model.Account;
 import dev.renvl.model.AccountBalance;
 import dev.renvl.model.Currency;
+import dev.renvl.publisher.RabbitMQProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -22,10 +23,12 @@ public class AccountServiceImpl implements AccountService {
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountServiceImpl.class);
     private final AccountMapper accountMapper;
     private final AccountBalanceMapper accountBalanceMapper;
+    private final RabbitMQProducer producer;
 
-    public AccountServiceImpl(AccountMapper accountMapper, AccountBalanceMapper accountBalanceMapper) {
+    public AccountServiceImpl(AccountMapper accountMapper, AccountBalanceMapper accountBalanceMapper, RabbitMQProducer producer) {
         this.accountMapper = accountMapper;
         this.accountBalanceMapper = accountBalanceMapper;
+        this.producer = producer;
     }
 
     @Override
@@ -33,17 +36,17 @@ public class AccountServiceImpl implements AccountService {
     public AccountResponse createAccount(CreateAccountRequest request) {
         Account account = new Account(request.getCountry(), request.getCustomerId());
         accountMapper.insert(account);
-        LOGGER.info("Created: {}", account);
 
         List<AccountBalance> accountBalances = new ArrayList<>();
         for (Currency currency : request.getCurrencies()) {
             AccountBalance accountBalance = new AccountBalance(currency, account.getAccountId());
             accountBalanceMapper.insert(accountBalance);
             accountBalances.add(accountBalance);
-            LOGGER.info("Created: {}", accountBalance);
         }
 
-        return new AccountResponse(account.getAccountId(), account.getCustomerId(), accountBalances);
+        AccountResponse accountResponse = new AccountResponse(account.getAccountId(), account.getCustomerId(), accountBalances);
+        producer.sendMessage(accountResponse);
+        return accountResponse;
     }
 
     @Override

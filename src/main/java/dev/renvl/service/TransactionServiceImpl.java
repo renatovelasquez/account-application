@@ -9,6 +9,7 @@ import dev.renvl.mapper.AccountBalanceMapper;
 import dev.renvl.mapper.AccountMapper;
 import dev.renvl.mapper.TransactionMapper;
 import dev.renvl.model.*;
+import dev.renvl.publisher.RabbitMQProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -24,12 +25,14 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionMapper transactionMapper;
     private final AccountBalanceMapper accountBalanceMapper;
     private final AccountMapper accountMapper;
+    private final RabbitMQProducer producer;
 
     public TransactionServiceImpl(TransactionMapper transactionMapper, AccountBalanceMapper accountBalanceMapper,
-                                  AccountMapper accountMapper) {
+                                  AccountMapper accountMapper, RabbitMQProducer producer) {
         this.transactionMapper = transactionMapper;
         this.accountBalanceMapper = accountBalanceMapper;
         this.accountMapper = accountMapper;
+        this.producer = producer;
     }
 
     @Override
@@ -55,16 +58,17 @@ public class TransactionServiceImpl implements TransactionService {
         accountBalance.setAvailableAmount(currentBalance);
 
         accountBalanceMapper.updateAvailableAmount(accountBalance);
-        LOGGER.info("Updated: {}", accountBalance);
+        producer.updateMessage(accountBalance);
 
         Transaction transaction = new Transaction(request.getAmount(), Currency.valueOf(request.getCurrency()),
                 request.getDirection(), request.getDescription(), request.getAccountId());
         transactionMapper.insert(transaction);
-        LOGGER.info("Created: {}", transaction);
 
-        return new CreateTransactionResponse(transaction.getAccountId(), transaction.getTransactionId(),
+        CreateTransactionResponse transactionResponse = new CreateTransactionResponse(transaction.getAccountId(), transaction.getTransactionId(),
                 transaction.getAmount(), transaction.getCurrency(), transaction.getDirection(),
                 transaction.getDescription(), currentBalance);
+        producer.sendMessage(transactionResponse);
+        return transactionResponse;
     }
 
     private AccountBalance retrieveAccountBalance(CreateTransactionRequest request) {

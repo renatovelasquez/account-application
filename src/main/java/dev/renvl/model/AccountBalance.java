@@ -6,13 +6,14 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @ToString
-public class AccountBalance {
+public class AccountBalance implements Serializable {
     @JsonIgnore
     private Integer accountBalanceId;
     private BigDecimal availableAmount;

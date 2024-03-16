@@ -8,6 +8,7 @@ import dev.renvl.mapper.AccountMapper;
 import dev.renvl.model.Account;
 import dev.renvl.model.AccountBalance;
 import dev.renvl.model.Currency;
+import dev.renvl.publisher.RabbitMQProducer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -29,10 +30,10 @@ class AccountServiceImplTest {
     private AccountMapper accountMapper;
     @Mock
     private AccountBalanceMapper accountBalanceMapper;
-
+    @Mock
+    private RabbitMQProducer producer;
     @InjectMocks
     private AccountServiceImpl accountService;
-
 
     @Test
     void AccountService_CreateAccount_ReturnsAccountResponse() {
@@ -48,6 +49,9 @@ class AccountServiceImplTest {
             accountBalanceMapper.insert(accountBalance);
         }
         verify(accountBalanceMapper, times(request.getCurrencies().size())).insert(any(AccountBalance.class));
+
+        producer.sendMessage(AccountResponse.class);
+        verify(producer, times(1)).sendMessage(AccountResponse.class);
 
         AccountResponse accountCreated = accountService.createAccount(request);
         assertNotNull(accountCreated);

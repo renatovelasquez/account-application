@@ -9,6 +9,7 @@ import dev.renvl.mapper.AccountBalanceMapper;
 import dev.renvl.mapper.AccountMapper;
 import dev.renvl.mapper.TransactionMapper;
 import dev.renvl.model.*;
+import dev.renvl.publisher.RabbitMQProducer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -33,6 +34,8 @@ class TransactionServiceImplTest {
     private AccountMapper accountMapper;
     @Mock
     private AccountBalanceMapper accountBalanceMapper;
+    @Mock
+    private RabbitMQProducer producer;
     @InjectMocks
     private TransactionServiceImpl transactionService;
 
@@ -48,9 +51,15 @@ class TransactionServiceImplTest {
         AccountBalance accountBalanceEUR = new AccountBalance(Currency.EUR, account.getAccountId());
         when(accountBalanceMapper.findByAccountIdAndCurrency(request.getAccountId(), request.getCurrency())).thenReturn(accountBalanceEUR);
 
+        producer.updateMessage(AccountBalance.class);
+        verify(producer, times(1)).updateMessage(AccountBalance.class);
+
         Transaction transaction = new Transaction(request.getAmount(), Currency.valueOf(request.getCurrency()), request.getDirection(), request.getDescription(), request.getAccountId());
         transactionMapper.insert(transaction);
         verify(transactionMapper, times(1)).insert(transaction);
+
+        producer.sendMessage(CreateTransactionResponse.class);
+        verify(producer, times(1)).sendMessage(CreateTransactionResponse.class);
 
         CreateTransactionResponse response = transactionService.createTransaction(request);
         assertNotNull(response);
@@ -69,9 +78,15 @@ class TransactionServiceImplTest {
         accountBalanceEUR.setAvailableAmount(BigDecimal.ONE);
         when(accountBalanceMapper.findByAccountIdAndCurrency(request.getAccountId(), request.getCurrency())).thenReturn(accountBalanceEUR);
 
+        producer.updateMessage(AccountBalance.class);
+        verify(producer, times(1)).updateMessage(AccountBalance.class);
+
         Transaction transaction = new Transaction(request.getAmount(), Currency.valueOf(request.getCurrency()), request.getDirection(), request.getDescription(), request.getAccountId());
         transactionMapper.insert(transaction);
         verify(transactionMapper, times(1)).insert(transaction);
+
+        producer.sendMessage(CreateTransactionResponse.class);
+        verify(producer, times(1)).sendMessage(CreateTransactionResponse.class);
 
         CreateTransactionResponse response = transactionService.createTransaction(request);
         assertNotNull(response);
@@ -132,18 +147,4 @@ class TransactionServiceImplTest {
         assertThrows(UnfinishedStubbingException.class, () -> doThrow().when(accountMapper).findById(null));
         accountMapper.findById(null);
     }
-
-//    @Test
-//    void givenNull_WhenDoubleInteger_ThenNull() throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-//        CreateTransactionRequest request = CreateTransactionRequest.builder().accountId(1).amount(BigDecimal.ONE)
-//                .currency(Currency.EUR.name()).direction(DirectionTransaction.IN.name()).description("Description about transaction IN").build();
-//
-//        assertEquals(BigDecimal.ONE, getValidateAmountMethod().invoke(transactionService, request, BigDecimal.ZERO));
-//    }
-//    private Method getValidateAmountMethod() throws NoSuchMethodException {
-//        Method method = TransactionServiceImpl.class.getDeclaredMethod("validateAmount", CreateTransactionRequest.class, BigDecimal.class);
-//        method.setAccessible(true);
-//        return method;
-//    }
-
 }
