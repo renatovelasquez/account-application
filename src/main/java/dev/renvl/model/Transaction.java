@@ -1,12 +1,14 @@
 package dev.renvl.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 
-@Data
+@Getter
 @AllArgsConstructor
+@ToString
 public class Transaction {
     private Integer transactionId;
     private BigDecimal amount;

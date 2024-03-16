@@ -2,12 +2,16 @@ package dev.renvl.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
+@ToString
 public class AccountBalance {
     @JsonIgnore
     private Integer accountBalanceId;

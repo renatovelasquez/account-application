@@ -83,7 +83,7 @@ class AccountServiceImplTest {
     }
 
     @Test
-    void givenNotFoundAccountId_whenGetAccount_thenThrowsException() {
+    void GivenNotFoundAccountId_whenGetAccount_thenThrowsException() {
         Integer accountId = 0;
         when(accountMapper.findById(accountId)).thenReturn(null);
 
@@ -91,7 +91,7 @@ class AccountServiceImplTest {
     }
 
     @Test
-    void givenNullAccountId_whenGetAccount_thenThrowsException() {
+    void GivenNullAccountId_whenGetAccount_thenThrowsException() {
         assertThrows(UnfinishedStubbingException.class, () -> doThrow().when(accountMapper).findById(null));
         accountMapper.findById(null);
     }

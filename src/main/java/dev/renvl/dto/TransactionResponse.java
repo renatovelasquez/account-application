@@ -2,11 +2,11 @@ package dev.renvl.dto;
 
 import dev.renvl.model.Transaction;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 
 import java.util.List;
 
-@Data
+@Getter
 @AllArgsConstructor
 public class TransactionResponse {
     private List<Transaction> transactions;

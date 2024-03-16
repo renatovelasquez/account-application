@@ -5,13 +5,13 @@ import dev.renvl.utils.ListMatchesEnum;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Data
 @Builder
+@Getter
 @AllArgsConstructor
 public class CreateAccountRequest {
 

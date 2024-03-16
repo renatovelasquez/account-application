@@ -2,11 +2,11 @@ package dev.renvl.dto;
 
 import dev.renvl.model.AccountBalance;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 
 import java.util.List;
 
-@Data
+@Getter
 @AllArgsConstructor
 public class AccountResponse {
     private Integer accountId;
