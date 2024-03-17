@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  app:
+    image: 'account-application'
+    build:
+      context: .
+    container_name: app
+    depends_on:
+      - db
+      - rabbitmq
+    ports:
+      - "8080:8080"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=adminadmin
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/account_application_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=adminadmin
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+
+  db:
+    image: 'postgres:16.2'
+    container_name: db
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=adminadmin
+      - POSTGRES_DB=account_application_db
+    volumes:
+      - /db:/var/lib/postgresql
+
+  rabbitmq:
+    image: 'rabbitmq:3-management-alpine'
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq

@@ -1,6 +1,6 @@
 insert into customer (customer_id)
-values ('cliente_1');
+values ('CUSTOMER001');
 insert into customer (customer_id)
-values ('cliente_2');
+values ('CUSTOMER002');
 insert into customer (customer_id)
-values ('customer001');
+values ('CUSTOMER003');

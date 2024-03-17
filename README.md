@@ -69,7 +69,7 @@ Moreover, in Swagger UI for example, making a query is quite easy with example f
 
 ## Database Design
 
-![account_application_db.png](./account_application_db.png)
+![account_application_db.png](src/main/resources/account_application_db.png)
 
 ## RabbitMQ Integration
 
@@ -78,7 +78,7 @@ http://localhost:15672 RabbitMQ Management UI
 ## Parametrization:
 
 To connect Postgres and RabbitMQ use the properties according
-to [application.properties](./src/main/resources/application.properties)
+to [application.properties](src/main/resources/application.properties)
 
 ## License
 
