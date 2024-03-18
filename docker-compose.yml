@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   app:
-    image: 'account-application'
+    image: 'renvl/account-application:latest'
     build:
       context: .
     container_name: app

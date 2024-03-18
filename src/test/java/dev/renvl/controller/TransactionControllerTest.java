@@ -59,7 +59,7 @@ class TransactionControllerTest {
         when(transactionService.createTransaction(request)).thenReturn(expectedResponse);
 
         ResponseEntity<CreateTransactionResponse> transactionCreated = transactionController.createTransaction(request);
-        assertEquals(HttpStatus.OK, transactionCreated.getStatusCode());
+        assertEquals(HttpStatus.CREATED, transactionCreated.getStatusCode());
         assertEquals(expectedResponse, transactionCreated.getBody());
     }
 

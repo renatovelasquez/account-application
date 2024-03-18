@@ -17,30 +17,22 @@ history and the capability to publish messages into RabbitMQ for downstream cons
 - Jacoco (Test coverage 80%)
 - Currently, only tested on Fedora 39 and IntelliJ IDEA
 
-## How to run:
+## Running using Docker Compose:
+
+- `docker-compose -f docker-compose.yml up`
+
+## How to run locally:
 
 - `cd account-application`
-- `gradle clean build`
+- `gradle clean`
 - `gradle bootRun`
 
 ## Run with Docker:
-
-#### Using the existing JAR file:
-
-- `cd account-application`
-- `docker build --no-cache --build-arg JAR_FILE=account-application.jar -t renvl/account-application .`
-- `docker run -p 8080:8080 -t renvl/account-application`
-
-#### Compiling the application:
 
 - `cd account-application`
 - `gradle clean build`
 - `docker build --no-cache --build-arg JAR_FILE=build/libs/\*.jar -t renvl/account-application .`
 - `docker run -p 8080:8080 -t renvl/account-application`
-
-## Running using Docker Compose:
-
-- `docker-compose -f docker-compose.yml up`
 
 ## API:
 

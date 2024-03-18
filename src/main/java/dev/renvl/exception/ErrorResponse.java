@@ -1,8 +1,9 @@
 package dev.renvl.exception;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class ErrorResponse {
+public class ErrorResponse implements Serializable {
     private String message;
     private List<String> details;
 

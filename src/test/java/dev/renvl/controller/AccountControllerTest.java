@@ -57,7 +57,7 @@ public class AccountControllerTest {
         when(accountService.createAccount(request)).thenReturn(expectedResponse);
 
         ResponseEntity<AccountResponse> accountCreated = accountController.createAccount(request);
-        assertEquals(HttpStatus.OK, accountCreated.getStatusCode());
+        assertEquals(HttpStatus.CREATED, accountCreated.getStatusCode());
         assertEquals(expectedResponse, accountCreated.getBody());
     }
 }

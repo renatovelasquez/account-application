@@ -10,6 +10,7 @@ import dev.renvl.mapper.AccountMapper;
 import dev.renvl.mapper.TransactionMapper;
 import dev.renvl.model.*;
 import dev.renvl.publisher.RabbitMQProducer;
+import dev.renvl.utils.AtomicDecimal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -54,8 +55,8 @@ public class TransactionServiceImpl implements TransactionService {
     public CreateTransactionResponse createTransaction(CreateTransactionRequest request) {
         AccountBalance accountBalance = retrieveAccountBalance(request);
 
-        BigDecimal currentBalance = validateAmount(request, accountBalance.getAvailableAmount());
-        accountBalance.setAvailableAmount(currentBalance);
+        AtomicDecimal currentBalance = validateAmount(request, accountBalance.getAvailableAmount());
+        accountBalance.setAvailableAmount(currentBalance.get());
 
         accountBalanceMapper.updateAvailableAmount(accountBalance);
         producer.updateMessage(accountBalance);
@@ -66,31 +67,32 @@ public class TransactionServiceImpl implements TransactionService {
 
         CreateTransactionResponse transactionResponse = new CreateTransactionResponse(transaction.getAccountId(), transaction.getTransactionId(),
                 transaction.getAmount(), transaction.getCurrency(), transaction.getDirection(),
-                transaction.getDescription(), currentBalance);
+                transaction.getDescription(), currentBalance.get());
         producer.sendMessage(transactionResponse);
         return transactionResponse;
     }
 
     private AccountBalance retrieveAccountBalance(CreateTransactionRequest request) {
         Account account = accountMapper.findById(request.getAccountId());
-        AccountBalance accountBalance = accountBalanceMapper.findByAccountIdAndCurrency(
+        List<AccountBalance> accountBalances = accountBalanceMapper.findByAccountIdAndCurrency(
                 request.getAccountId(), request.getCurrency());
-        if (account == null || accountBalance == null) {
+        if (account == null || accountBalances.isEmpty()) {
             throw new RecordNotFoundException("Account not found with id: " + request.getAccountId());
         }
-        LOGGER.info("Retrieved: {}", accountBalance);
-        return accountBalance;
+        LOGGER.info("Retrieved: {}", accountBalances.get(0));
+        return accountBalances.get(0);
     }
 
-    private BigDecimal validateAmount(CreateTransactionRequest request, BigDecimal currentBalance) {
+    private AtomicDecimal validateAmount(CreateTransactionRequest request, BigDecimal currentBalance) {
+        AtomicDecimal newBalance = new AtomicDecimal(currentBalance);
         if (DirectionTransaction.IN.name().compareTo(request.getDirection()) == 0) {
-            currentBalance = currentBalance.add(request.getAmount());
+            newBalance.set(newBalance.add(request.getAmount()));
         } else if (currentBalance.compareTo(request.getAmount()) >= 0) {
-            currentBalance = currentBalance.subtract(request.getAmount());
+            newBalance.set(newBalance.subtract(request.getAmount()));
         } else {
             throw new InsufficientFundsException("Insufficient funds to perform the transaction");
         }
-        LOGGER.info("Validation for New Balance amount= {}", currentBalance);
-        return currentBalance;
+        LOGGER.info("Validation for New Balance amount= {}", newBalance.get());
+        return newBalance;
     }
 }

@@ -49,7 +49,7 @@ class TransactionServiceImplTest {
         when(accountMapper.findById(request.getAccountId())).thenReturn(account);
 
         AccountBalance accountBalanceEUR = new AccountBalance(Currency.EUR, account.getAccountId());
-        when(accountBalanceMapper.findByAccountIdAndCurrency(request.getAccountId(), request.getCurrency())).thenReturn(accountBalanceEUR);
+        when(accountBalanceMapper.findByAccountIdAndCurrency(request.getAccountId(), request.getCurrency())).thenReturn(List.of(accountBalanceEUR));
 
         producer.updateMessage(AccountBalance.class);
         verify(producer, times(1)).updateMessage(AccountBalance.class);
@@ -76,7 +76,7 @@ class TransactionServiceImplTest {
 
         AccountBalance accountBalanceEUR = new AccountBalance(Currency.EUR, account.getAccountId());
         accountBalanceEUR.setAvailableAmount(BigDecimal.ONE);
-        when(accountBalanceMapper.findByAccountIdAndCurrency(request.getAccountId(), request.getCurrency())).thenReturn(accountBalanceEUR);
+        when(accountBalanceMapper.findByAccountIdAndCurrency(request.getAccountId(), request.getCurrency())).thenReturn(List.of(accountBalanceEUR));
 
         producer.updateMessage(AccountBalance.class);
         verify(producer, times(1)).updateMessage(AccountBalance.class);
@@ -113,7 +113,7 @@ class TransactionServiceImplTest {
 
         AccountBalance accountBalanceEUR = new AccountBalance(Currency.EUR, account.getAccountId());
         accountBalanceEUR.setAvailableAmount(BigDecimal.ZERO);
-        when(accountBalanceMapper.findByAccountIdAndCurrency(request.getAccountId(), request.getCurrency())).thenReturn(accountBalanceEUR);
+        when(accountBalanceMapper.findByAccountIdAndCurrency(request.getAccountId(), request.getCurrency())).thenReturn(List.of(accountBalanceEUR));
 
         assertThrows(InsufficientFundsException.class, () -> transactionService.createTransaction(request));
     }
