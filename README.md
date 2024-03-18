@@ -41,6 +41,18 @@ docker build --no-cache --build-arg JAR_FILE=build/libs/\*.jar -t renvl/account-
 docker run -p 8080:8080 -t renvl/account-application
 ```
 
+## Database Design
+
+![account_application_db.png](src/main/resources/account_application_db.png)
+
+Available Customers ID
+
+| customer\_id |
+|:-------------|
+| CUSTOMER001  |
+| CUSTOMER002  |
+| CUSTOMER003  |
+
 ## API:
 
 ### http[]()://localhost:8080/api Endpoint
@@ -93,10 +105,6 @@ http://localhost:8080/swagger-ui/index.html Swagger-UI formatted documentation.
 
 NB!, in the API documentation pages, documentations for POST and GET requests for the account-application can be seen.
 Moreover, in Swagger UI for example, making a query is quite easy with example formats.
-
-## Database Design
-
-![account_application_db.png](src/main/resources/account_application_db.png)
 
 ## RabbitMQ Integration
 

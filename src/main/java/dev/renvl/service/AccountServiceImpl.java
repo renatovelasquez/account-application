@@ -5,9 +5,11 @@ import dev.renvl.dto.CreateAccountRequest;
 import dev.renvl.exception.RecordNotFoundException;
 import dev.renvl.mapper.AccountBalanceMapper;
 import dev.renvl.mapper.AccountMapper;
+import dev.renvl.mapper.CustomerMapper;
 import dev.renvl.model.Account;
 import dev.renvl.model.AccountBalance;
 import dev.renvl.model.Currency;
+import dev.renvl.model.Customer;
 import dev.renvl.publisher.RabbitMQProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,11 +23,13 @@ import java.util.List;
 @Service
 public class AccountServiceImpl implements AccountService {
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountServiceImpl.class);
+    private final CustomerMapper customerMapper;
     private final AccountMapper accountMapper;
     private final AccountBalanceMapper accountBalanceMapper;
     private final RabbitMQProducer producer;
 
-    public AccountServiceImpl(AccountMapper accountMapper, AccountBalanceMapper accountBalanceMapper, RabbitMQProducer producer) {
+    public AccountServiceImpl(CustomerMapper customerMapper, AccountMapper accountMapper, AccountBalanceMapper accountBalanceMapper, RabbitMQProducer producer) {
+        this.customerMapper = customerMapper;
         this.accountMapper = accountMapper;
         this.accountBalanceMapper = accountBalanceMapper;
         this.producer = producer;
@@ -34,7 +38,12 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public AccountResponse createAccount(CreateAccountRequest request) {
-        Account account = new Account(request.getCountry(), request.getCustomerId());
+        Customer customer = customerMapper.getCustomer(request.getCustomerId());
+        if (customer == null) {
+            throw new RecordNotFoundException("Customer not found with id: " + request.getCustomerId());
+        }
+
+        Account account = new Account(request.getCountry(), customer.getCustomerId());
         accountMapper.insert(account);
 
         List<AccountBalance> accountBalances = new ArrayList<>();
