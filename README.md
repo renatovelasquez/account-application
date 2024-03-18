@@ -19,40 +19,75 @@ history and the capability to publish messages into RabbitMQ for downstream cons
 
 ## Running using Docker Compose:
 
-- `docker-compose -f docker-compose.yml up`
+```bash
+cd account-application
+docker-compose -f docker-compose.yml up --build
+```
 
 ## How to run locally:
 
-- `cd account-application`
-- `gradle clean`
-- `gradle bootRun`
+```bash
+cd account-application
+gradle clean
+gradle bootRun
+```
 
 ## Run with Docker:
 
-- `cd account-application`
-- `gradle clean build`
-- `docker build --no-cache --build-arg JAR_FILE=build/libs/\*.jar -t renvl/account-application .`
-- `docker run -p 8080:8080 -t renvl/account-application`
+```bash
+cd account-application
+gradle clean build
+docker build --no-cache --build-arg JAR_FILE=build/libs/\*.jar -t renvl/account-application .
+docker run -p 8080:8080 -t renvl/account-application
+```
 
 ## API:
 
-http://localhost:8080/api Endpoint.
-
-#### /accounts/v1/:id
-
-* `GET` : Get an Account by ID
+### http[]()://localhost:8080/api Endpoint
 
 #### /accounts/v1/
 
 * `POST` : Create a new account
 
-#### /transactions/v1/:id
+    ```bash
+    curl --request POST \
+      --url http://localhost:8080/api/accounts/v1 \
+      --header 'Content-Type: application/json' \
+      --data '{
+      "customerId": "CUSTOMER001",
+      "country": "Estonia",
+      "currencies": [
+      "EUR", "USD"
+      ]
+      }'
+    ```
 
-* `GET` : Get all transactions by Account ID
+#### /accounts/v1/:id
+
+* `GET` : Get an Account by ID
 
 #### /transactions/v1/
 
 * `POST` : Create a new transactions for an Account
+
+    ```bash
+    curl --request POST \
+    --url http://localhost:8080/api/transactions/v1 \
+    --header 'Content-Type: application/json' \
+    --data '{
+      "accountId": 1,
+      "amount": 123.45,
+      "currency": "EUR",
+      "direction": "IN",
+      "description": "EUR deposit."
+    }'
+    ```
+
+#### /transactions/v1/:id
+
+* `GET` : Get all transactions by Account ID
+
+## Swagger-ui
 
 http://localhost:8080/swagger-ui/index.html Swagger-UI formatted documentation.
 
