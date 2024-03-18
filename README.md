@@ -21,7 +21,7 @@ history and the capability to publish messages into RabbitMQ for downstream cons
 
 ```bash
 cd account-application
-docker-compose -f docker-compose.yml up --build
+docker-compose -f docker-compose.yml up
 ```
 
 ## How to run locally:
